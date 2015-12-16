@@ -12,7 +12,8 @@ var express 		= require('express'),
 	session			= require('express-session'),
 	configDB		= require('./config/database.js'),
 	
-	ports			= require('./config/ports'),
+	msg				= require('./config/messages_constants'),
+	appSettings		= require('./config/app_settings.js'),
 	startServer		= require('./routes/server_actions');
 
 var app = express();
@@ -20,11 +21,11 @@ var app = express();
 // Authentication
 require('./config/passport')(passport);
 mongoose.connect(configDB.url);
-app.set('view engine', 'ejs');
-app.use(morgan('dev'));
+app.set('view engine', appSettings.view_engine);
+app.use(morgan(appSettings.log_level));
 app.use(cookieParser());
 app.use(bodyParser());
-app.use(session({ secret: 'believeitornotitsjohnlee' }));
+app.use(session({ secret: appSettings.secret }));
 app.use(passport.initialize());
 app.use(passport.session());
 app.use(flash());
@@ -41,6 +42,6 @@ app.use('/css', expressLess(__dirname + '/less'));
 app.use(startServer);
 
 
-var server = app.listen(ports.listenPort, function() {
-	console.log('Server started successfully.');
+var server = app.listen(appSettings.port, function() {
+	console.log(msg.server_start_success);
 });

@@ -9,7 +9,7 @@ router.get('/server_status', function(req, res) {
 	res.send(minecraftProcess == null ? 'offline' : 'online');
 });
 
-router.post('/start_server', function(req, res) {
+router.post('/start_server', isLoggedIn, function(req, res) {
 	if (minecraftProcess == null) {
 		minecraftProcess = createNewMinecraftProcess();
 		res.send('Server spawned.');
@@ -19,7 +19,7 @@ router.post('/start_server', function(req, res) {
 	}
 });
 
-router.post('/stop_server', function(req, res) {	
+router.post('/stop_server', isLoggedIn, function(req, res) {	
 	if (minecraftProcess != null) {
 		minecraftProcess.kill('SIGINT');
 		minecraftProcess = null;
@@ -31,7 +31,7 @@ router.post('/stop_server', function(req, res) {
 	}
 });
 
-router.post('/exec_command', function(req, res) {
+router.post('/exec_command', isLoggedIn, function(req, res) {
 	if (minecraftProcess != null) {
 		minecraftProcess.stdin.write('/say hello\n');
 	}
@@ -48,6 +48,12 @@ function createNewMinecraftProcess() {
 					   {cwd: minecraft.server_directory});
 	server.stdin.setEncoding('utf-8');
 	return server;
+}
+
+function isLoggedIn(req, res, next) {
+	console.log(req.isAuthenticated());
+	if (req.isAuthenticated() && req.user.admin) return next();
+	res.send('You must log in as an administrator to perform this action.');
 }
 
 module.exports = router;

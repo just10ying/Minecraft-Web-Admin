@@ -29,7 +29,7 @@
 			<a href="/logout">Logout</a>
 		<% } %>
 		
-		<% if (admin) { %>
+		<% if (user && user.local.admin) { %>
 			<div id="admin-container"></div>
 			<script src="admin_modules.js"></script>	
 		<% } %>
