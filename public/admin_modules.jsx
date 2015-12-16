@@ -57,4 +57,4 @@ var data = [
 ];
 
 ReactDOM.render(<CommentBox data={data} />, 
-				document.getElementById('test'));
+				document.getElementById('admin-container'));

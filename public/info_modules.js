@@ -58,4 +58,4 @@ var data = [
 ];
 
 ReactDOM.render(React.createElement(CommentBox, {data: data}), 
-				document.getElementById('test'));
+				document.getElementById('info-container'));

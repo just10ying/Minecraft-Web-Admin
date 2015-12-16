@@ -4,10 +4,31 @@ var express 		= require('express'),
 	bodyParser		= require('body-parser'),
 	jsxCompile		= require('express-jsx'),
 	
-	constants		= require('./constants'),
+	mongoose		= require('mongoose'),
+	passport		= require('passport'),
+	flash			= require('connect-flash'),
+	morgan			= require('morgan'),
+	cookieParser	= require('cookie-parser'),
+	session			= require('express-session'),
+	configDB		= require('./config/database.js'),
+	
+	ports			= require('./config/ports'),
 	startServer		= require('./routes/server_actions');
 
 var app = express();
+
+// Authentication
+require('./config/passport')(passport);
+mongoose.connect(configDB.url);
+app.set('view engine', 'ejs');
+app.use(morgan('dev'));
+app.use(cookieParser());
+app.use(bodyParser());
+app.use(session({ secret: 'believeitornotitsjohnlee' }));
+app.use(passport.initialize());
+app.use(passport.session());
+app.use(flash());
+require('./routes/auth')(app, passport);
 
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({
@@ -20,6 +41,6 @@ app.use('/css', expressLess(__dirname + '/less'));
 app.use(startServer);
 
 
-var server = app.listen(constants.port, function() {
+var server = app.listen(ports.listenPort, function() {
 	console.log('Server started successfully.');
 });

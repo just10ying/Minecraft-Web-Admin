@@ -1,5 +1,5 @@
 var express 	= require('express'),
-	constants	= require('../constants'),
+	minecraft	= require('../config/minecraft'),
 	spawn		= require('child_process').spawn;
 var router = express.Router();
 
@@ -43,9 +43,9 @@ router.post('/exec_command', function(req, res) {
 });
 
 function createNewMinecraftProcess() {
-	var server = spawn(constants.server_start_cmd, 
-				 	   constants.server_start_args,
-					   {cwd: constants.server_directory});
+	var server = spawn(minecraft.server_start_cmd, 
+				 	   minecraft.server_start_args,
+					   {cwd: minecraft.server_directory});
 	server.stdin.setEncoding('utf-8');
 	return server;
 }
