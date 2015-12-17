@@ -24,8 +24,8 @@ var ServerStatus = React.createClass({
 	},
 	
 	getStatusStyle: function() {
-		var color = 'red';
-		if (this.state.server_state == null) color = 'yellow';
+		var color = 'yellow'; // By default, color for unlisted states is yellow.
+		if (this.state.server_state == 'offline') color = 'red';
 		else if (this.state.server_state == 'online') color = 'green';
 		
 		return {

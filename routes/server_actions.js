@@ -16,8 +16,7 @@ router.get('/server_status', function(req, res) {
 
 router.post('/start_server', isLoggedIn, function(req, res) {
 	if (minecraftProcess == null) {
-		minecraftProcess = createNewMinecraftProcess();
-		updateServerStatus(minecraft.server_online);
+		createNewMinecraftProcess();
 		res.send(msg.success);
 	}
 	else {
@@ -27,11 +26,8 @@ router.post('/start_server', isLoggedIn, function(req, res) {
 
 router.post('/stop_server', isLoggedIn, function(req, res) {	
 	if (minecraftProcess != null) {
-		minecraftProcess.kill('SIGINT');
-		updateServerStatus(minecraft.server_offline);
-		minecraftProcess = null;
+		killMinecraftProcess();
 		res.send(msg.success);
-		
 	}
 	else {
 		res.send(msg.failure);
@@ -66,7 +62,20 @@ function createNewMinecraftProcess() {
 				 	   minecraft.server_start_args,
 					   {cwd: minecraft.server_directory});
 	server.stdin.setEncoding('utf-8');
-	return server;
+	server.stdout.on('data', function(buf) {
+		if (buf.toString().match(minecraft.server_online_regex) !== null) {
+			// When we find a match that indicates the server is online, broadcast this event.
+			updateServerStatus(minecraft.server_online);
+		}
+	});
+	minecraftProcess = server;
+	updateServerStatus(minecraft.server_starting);
+}
+
+function killMinecraftProcess() {
+	minecraftProcess.kill('SIGINT');
+	updateServerStatus(minecraft.server_offline);
+	minecraftProcess = null;
 }
 
 function isLoggedIn(req, res, next) {
