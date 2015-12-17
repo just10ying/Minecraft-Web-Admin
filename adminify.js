@@ -12,9 +12,7 @@ User.findOneAndUpdate(User.generateSearchObject(username),
 					 { $set: { 'local.admin' : makeAdmin }},
 					 { new: true },
 					 function(err, user) {
-	if (err) throw err;
-
-	console.log(username + ' successfully updated to admin = ' + makeAdmin);
-
-	mongoose.disconnect();
-});
+						if (err) throw err;
+						console.log(username + ' successfully updated to admin = ' + makeAdmin);
+						mongoose.disconnect();
+					 });

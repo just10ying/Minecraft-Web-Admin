@@ -1,61 +1,24 @@
 
-var CommentBox = React.createClass({displayName: "CommentBox",
+var ServerInfo = React.createClass({displayName: "ServerInfo",
 	render: function() {
 		return (
-			React.createElement("div", {className: "commentBox"}, 
-				React.createElement("h1", null, "Comments"), 
-				React.createElement(CommentList, {data: this.props.data}), 
-				React.createElement(CommentForm, null)
-			)
+			React.createElement(ServerStatus, null)
 		);
 	}
 });
 
-var CommentList = React.createClass({displayName: "CommentList",
+var ServerStatus = React.createClass({displayName: "ServerStatus",
 	render: function() {
-		var commentNodes = this.props.data.map(function(comment) {
-			return (
-				React.createElement(Comment, {author: comment.author, key: comment.id}, 
-					comment.text
-				)
-			);
-		});
 		return (
-			React.createElement("div", {className: "commentList"}, 
-				commentNodes
-			)
+			React.createElement("div", null, "Server status: offline")
 		);
 	}
 });
 
-var CommentForm = React.createClass({displayName: "CommentForm",
-	render: function() {
-		return (
-			React.createElement("div", {className: "commentForm"}, "Hello world!  I'm a comment form?")
-		);
-	}
+var socket = io.connect(':3001');
+socket.on('state_change', function(msg) {
+	console.log(msg);
 });
 
-var Comment = React.createClass({displayName: "Comment",
-	rawMarkup: function() {
-		return {__html: this.props.children.toString() };
-	},
-	render: function() {
-		return (
-			React.createElement("div", {className: "comment"}, 
-				React.createElement("h2", {className: "commentAuthor"}, 
-					this.props.author
-				), 
-				React.createElement("span", {dangerouslySetInnerHTML: this.rawMarkup()})
-			)
-		);
-	}
-});
-
-var data = [
-	{id: 1, author: "Joey Sadecky", text: "Believe it or not"},
-	{id: 2, author: "John Lee", text: "noooooOOOOOOOOOOOOOOO"}
-];
-
-ReactDOM.render(React.createElement(CommentBox, {data: data}), 
+ReactDOM.render(React.createElement(ServerInfo, null), 
 				document.getElementById('info-container'));

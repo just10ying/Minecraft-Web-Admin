@@ -1,61 +1,45 @@
 
-var CommentBox = React.createClass({displayName: "CommentBox",
-	render: function() {
-		return (
-			React.createElement("div", {className: "commentBox"}, 
-				React.createElement("h1", null, "Comments"), 
-				React.createElement(CommentList, {data: this.props.data}), 
-				React.createElement(CommentForm, null)
-			)
-		);
-	}
-});
+var StartButton = React.createClass({displayName: "StartButton",
 
-var CommentList = React.createClass({displayName: "CommentList",
-	render: function() {
-		var commentNodes = this.props.data.map(function(comment) {
-			return (
-				React.createElement(Comment, {author: comment.author, key: comment.id}, 
-					comment.text
-				)
-			);
-		});
-		return (
-			React.createElement("div", {className: "commentList"}, 
-				commentNodes
-			)
-		);
-	}
-});
-
-var CommentForm = React.createClass({displayName: "CommentForm",
-	render: function() {
-		return (
-			React.createElement("div", {className: "commentForm"}, "Hello world!  I'm a comment form?")
-		);
-	}
-});
-
-var Comment = React.createClass({displayName: "Comment",
-	rawMarkup: function() {
-		return {__html: this.props.children.toString() };
+	getInitialState: function() {
+		return {server_state: null};
 	},
+	
+	componentDidMount: function() {
+		$.get('/server_status', function(data) {
+			this.setState({
+				server_state: data
+			});
+		}.bind(this));
+	},
+	
+	startServer: function() {
+		$.post('/start_server', function(data) {
+			alert(data);
+		});
+	},
+	
 	render: function() {
 		return (
-			React.createElement("div", {className: "comment"}, 
-				React.createElement("h2", {className: "commentAuthor"}, 
-					this.props.author
-				), 
-				React.createElement("span", {dangerouslySetInnerHTML: this.rawMarkup()})
+			React.createElement("button", {className: "startButton", onClick: this.startServer, 
+					disabled: this.state.server_state != 'offline'}, 
+				"Start Server"
 			)
 		);
 	}
 });
 
-var data = [
-	{id: 1, author: "Joey Sadecky", text: "Believe it or not"},
-	{id: 2, author: "John Lee", text: "noooooOOOOOOOOOOOOOOO"}
-];
+var StopButton = React.createClass({displayName: "StopButton",
+	render: function() {
+		return (
+			React.createElement("button", {className: "startButton"}, "Stop Server")
+		);
+	}
+});
 
-ReactDOM.render(React.createElement(CommentBox, {data: data}), 
+
+ReactDOM.render(React.createElement("div", null, 
+					React.createElement(StartButton, null), 
+					React.createElement(StopButton, null)
+				), 
 				document.getElementById('admin-container'));

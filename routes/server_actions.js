@@ -1,47 +1,66 @@
 var express 	= require('express'),
 	minecraft	= require('../config/minecraft'),
-	spawn		= require('child_process').spawn;
-var router = express.Router();
-
+	msg			= require('../config/messages_constants'),
+	appSettings	= require('../config/app_settings'),
+	server		= require('http').createServer(),
+	spawn		= require('child_process').spawn,
+	io 			= require('socket.io')(server),
+	router 		= express.Router();
+	
 var minecraftProcess = null;
 
+// ----------------------------------- Routing ----------------------------------- //
 router.get('/server_status', function(req, res) {	
-	res.send(minecraftProcess == null ? 'offline' : 'online');
+	res.send(minecraftProcess == null ? msg.offline : msg.online);
 });
 
 router.post('/start_server', isLoggedIn, function(req, res) {
 	if (minecraftProcess == null) {
 		minecraftProcess = createNewMinecraftProcess();
-		res.send('Server spawned.');
+		updateServerStatus(minecraft.server_online);
+		res.send(msg.success);
 	}
 	else {
-		res.send('Server already active.');
+		res.send(msg.failure);
 	}
 });
 
 router.post('/stop_server', isLoggedIn, function(req, res) {	
 	if (minecraftProcess != null) {
 		minecraftProcess.kill('SIGINT');
+		updateServerStatus(minecraft.server_offline);
 		minecraftProcess = null;
-		res.send('Server stopped.');
+		res.send(msg.success);
 		
 	}
 	else {
-		res.send('No server running.');
+		res.send(msg.failure);
 	}
 });
 
 router.post('/exec_command', isLoggedIn, function(req, res) {
 	if (minecraftProcess != null) {
+		var command = req.body.command;
 		minecraftProcess.stdin.write('/say hello\n');
+		res.send(msg.success);
 	}
 	else {
-		
+		res.send(msg.failure);
 	}	
-	var command = req.body.command;
-	res.send('Command acknowledged.');
 });
 
+module.exports = router;
+
+// ----------------------------------- Websockets ----------------------------------- //
+var serverStatus = null;
+function updateServerStatus(newStatus) {
+	serverStatus = newStatus;
+	io.sockets.emit(minecraft.state_change, serverStatus);
+}
+
+server.listen(appSettings.websocketPort);
+
+// ----------------------------------- Helper Functions ----------------------------------- //
 function createNewMinecraftProcess() {
 	var server = spawn(minecraft.server_start_cmd, 
 				 	   minecraft.server_start_args,
@@ -51,9 +70,6 @@ function createNewMinecraftProcess() {
 }
 
 function isLoggedIn(req, res, next) {
-	console.log(req.isAuthenticated());
-	if (req.isAuthenticated() && req.user.admin) return next();
-	res.send('You must log in as an administrator to perform this action.');
+	if (req.isAuthenticated() && req.user.local.admin) return next();
+	res.send(msg.admin_required);
 }
-
-module.exports = router;

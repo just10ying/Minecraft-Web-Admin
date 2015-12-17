@@ -14,13 +14,14 @@ var express 		= require('express'),
 	
 	msg				= require('./config/messages_constants'),
 	appSettings		= require('./config/app_settings.js'),
-	startServer		= require('./routes/server_actions');
+	serverActions	= require('./routes/server_actions');
 
 var app = express();
 
 // Authentication
 require('./config/passport')(passport);
 mongoose.connect(configDB.url);
+
 app.set('view engine', appSettings.view_engine);
 app.use(morgan(appSettings.log_level));
 app.use(cookieParser());
@@ -36,11 +37,13 @@ app.use(bodyParser.urlencoded({
 	extended: true
 }));
 
-app.use(jsxCompile(path.join(__dirname, 'public')));
+app.use(jsxCompile(path.join(__dirname, 'react'), {
+	dest: path.join(__dirname, 'public')
+}));
 app.use(express.static(path.join( __dirname, 'public' )));
 app.use('/css', expressLess(__dirname + '/less'));
-app.use(startServer);
 
+app.use(serverActions);
 
 var server = app.listen(appSettings.port, function() {
 	console.log(msg.server_start_success);
