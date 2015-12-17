@@ -1,3 +1,5 @@
+
+
 var StartServerButton = React.createClass({
 
 	getInitialState: function() {
@@ -75,9 +77,11 @@ var StopServerButton = React.createClass({
 	}
 });
 
-
-ReactDOM.render(<div>
+var adminContainer = document.getElementById('admin-container');
+if (typeof adminContainer !== 'undefined') {
+	ReactDOM.render(<div>
 					<StartServerButton />
 					<StopServerButton />
 				</div>, 
 				document.getElementById('admin-container'));
+}

@@ -22,13 +22,27 @@ var ServerStatus = React.createClass({
 		if (this.state.server_state == null) return 'Fetching...';
 		return this.state.server_state;
 	},
+	
+	getStatusStyle: function() {
+		var color = 'red';
+		if (this.state.server_state == null) color = 'yellow';
+		else if (this.state.server_state == 'online') color = 'green';
+		
+		return {
+			color: color
+		};
+	},
 
 	render: function() {
 		return (
-			<h1>Server status: {this.currentState()}</h1>
+			<span>Server status:
+				<span style={this.getStatusStyle()}>
+					{this.currentState()}
+				</span>
+			</span>
 		);
 	}
 });
 
 ReactDOM.render(<ServerStatus />, 
-				document.getElementById('info-container'));
+				document.getElementById('server-status-container'));

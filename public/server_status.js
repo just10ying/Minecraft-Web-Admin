@@ -23,16 +23,27 @@ var ServerStatus = React.createClass({displayName: "ServerStatus",
 		if (this.state.server_state == null) return 'Fetching...';
 		return this.state.server_state;
 	},
+	
+	getStatusStyle: function() {
+		var color = 'red';
+		if (this.state.server_state == null) color = 'yellow';
+		else if (this.state.server_state == 'online') color = 'green';
+		
+		return {
+			color: color
+		};
+	},
 
 	render: function() {
 		return (
-			React.createElement("h1", null, "Server status: ", this.currentState())
+			React.createElement("span", null, "Server status:", 
+				React.createElement("span", {style: this.getStatusStyle()}, 
+					this.currentState()
+				)
+			)
 		);
 	}
 });
 
-var infoContainer = document.getElementById('info-container');
-if (typeof infoContainer !== 'undefined') {
-	ReactDOM.render(React.createElement(ServerStatus, null), 
-					document.getElementById('info-container'));
-}
+ReactDOM.render(React.createElement(ServerStatus, null), 
+				document.getElementById('server-status-container'));
