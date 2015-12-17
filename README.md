@@ -3,4 +3,11 @@
 Allows for the remote management of a vanilla Minecraft server.  This project currently supports authentication using passport.  Only users marked as administrators are able to access server controls.
 
 I created this project to familiarize myself with React, Node.js, Mongoose / MongoDB, and websockets.
-(...and also because a friend of mine is 10 years old and doesn't know how to use SSH to manage her Minecraft server)
+(...also because a friend is 10 years old and doesn't know how to use SSH to manage her Minecraft server)
+
+Goals:
+- [ ] Stop server safely by sending a command to stdin
+- [ ] Share constants between Node and client
+- [ ] Allow client to issue commands
+- [ ] Save and visualize metrics using C3
+- [ ] Make client UI prettier
