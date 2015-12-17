@@ -1,3 +1,5 @@
+#Minecraft-Web-Admin
+
 Allows for the remote management of a vanilla Minecraft server.  This project currently supports authentication using passport.  Only users marked as administrators are able to access server controls.
 
 I created this project to familiarize myself with React, Node.js, Mongoose / MongoDB, and websockets.
