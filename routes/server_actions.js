@@ -7,16 +7,64 @@ var express 	= require('express'),
 	io 			= require('socket.io')(server),
 	router 		= express.Router();
 	
-var minecraftProcess = null;
+server.listen(appSettings.websocketPort);
+
+// ----------------------------------- Minecraft Server Singleton ----------------------------------- //
+var minecraftProcess = (function() {
+	var process = null; // Initially no process
+	var server_status = minecraft.server_offline; // Initially offline
+	var setStatus = function(newStatus) {
+		server_status = newStatus;
+		io.sockets.emit(minecraft.state_change, server_status);
+	};
+	
+	var publicMethods = new Object;
+	publicMethods.create = function() {
+		process = spawn(minecraft.server_start_cmd, 
+					   minecraft.server_start_args,
+				       {cwd: minecraft.server_directory});
+					   process.stdin.setEncoding('utf-8');
+		process.stdout.on('data', function(buf) {
+			// When we find a match that indicates the server is online, broadcast this event.
+			if (buf.toString().match(minecraft.server_online_regex) !== null) {
+				setStatus(minecraft.server_online);
+			}
+		});
+		setStatus(minecraft.server_starting);
+	};
+	
+	publicMethods.sendCommand = function(command) {
+		if (process != null) {
+			process.stdin.write(command + '\n');
+		}
+	};
+	
+	publicMethods.getStatus = function() {
+		return server_status;
+	};
+	
+	publicMethods.stop = function(callback) {
+		setStatus(minecraft.server_stopping);
+		this.sendCommand(minecraft.server_stop_cmd);
+		process.on('exit', function() {
+			process = null;
+			setStatus(minecraft.server_offline);
+			if (typeof callback !== 'undefined') {
+				callback();
+			}
+		});
+	};
+	return publicMethods;
+})();
 
 // ----------------------------------- Routing ----------------------------------- //
-router.get('/server_status', function(req, res) {	
-	res.send(minecraftProcess == null ? msg.offline : msg.online);
+router.get('/server_status', function(req, res) {
+	res.send(minecraftProcess.getStatus());
 });
 
 router.post('/start_server', isLoggedIn, function(req, res) {
-	if (minecraftProcess == null) {
-		createNewMinecraftProcess();
+	if (minecraftProcess.getStatus() === minecraft.server_offline) {
+		minecraftProcess.create();
 		res.send(msg.success);
 	}
 	else {
@@ -25,9 +73,10 @@ router.post('/start_server', isLoggedIn, function(req, res) {
 });
 
 router.post('/stop_server', isLoggedIn, function(req, res) {	
-	if (minecraftProcess != null) {
-		killMinecraftProcess();
-		res.send(msg.success);
+	if (minecraftProcess.getStatus() === minecraft.server_online) {
+		minecraftProcess.stop(function() {
+			res.send(msg.success);
+		});
 	}
 	else {
 		res.send(msg.failure);
@@ -35,9 +84,8 @@ router.post('/stop_server', isLoggedIn, function(req, res) {
 });
 
 router.post('/exec_command', isLoggedIn, function(req, res) {
-	if (minecraftProcess != null) {
-		var command = req.body.command;
-		minecraftProcess.stdin.write('/say hello\n');
+	if (minecraftProcess.getStatus() === minecraft.server_online) {
+		minecraftProcess.sendCommand(req.body.command);
 		res.send(msg.success);
 	}
 	else {
@@ -47,36 +95,7 @@ router.post('/exec_command', isLoggedIn, function(req, res) {
 
 module.exports = router;
 
-// ----------------------------------- Websockets ----------------------------------- //
-var serverStatus = null;
-function updateServerStatus(newStatus) {
-	serverStatus = newStatus;
-	io.sockets.emit(minecraft.state_change, serverStatus);
-}
-
-server.listen(appSettings.websocketPort);
-
 // ----------------------------------- Helper Functions ----------------------------------- //
-function createNewMinecraftProcess() {
-	var server = spawn(minecraft.server_start_cmd, 
-				 	   minecraft.server_start_args,
-					   {cwd: minecraft.server_directory});
-	server.stdin.setEncoding('utf-8');
-	server.stdout.on('data', function(buf) {
-		if (buf.toString().match(minecraft.server_online_regex) !== null) {
-			// When we find a match that indicates the server is online, broadcast this event.
-			updateServerStatus(minecraft.server_online);
-		}
-	});
-	minecraftProcess = server;
-	updateServerStatus(minecraft.server_starting);
-}
-
-function killMinecraftProcess() {
-	minecraftProcess.kill('SIGINT');
-	updateServerStatus(minecraft.server_offline);
-	minecraftProcess = null;
-}
 
 function isLoggedIn(req, res, next) {
 	if (req.isAuthenticated() && req.user.local.admin) return next();

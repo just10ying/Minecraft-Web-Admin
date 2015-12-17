@@ -6,7 +6,7 @@ I created this project to familiarize myself with React, Node.js, Mongoose / Mon
 (...also because a friend is 10 years old and doesn't know how to use SSH to manage her Minecraft server)
 
 Goals:
-- [ ] Stop server safely by sending a command to stdin
+- [x] Stop server safely by sending a command to stdin
 - [ ] Share constants between Node and client
 - [ ] Allow client to issue commands
 - [ ] Save and visualize metrics using C3
