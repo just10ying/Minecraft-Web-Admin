@@ -20,7 +20,7 @@ var ServerStatus = React.createClass({displayName: "ServerStatus",
 	},
 	
 	currentState: function() {
-		if (this.state.server_state == null) return 'Fetching...';
+		if (this.state.server_state == null) return 'fetching...';
 		return this.state.server_state;
 	},
 	
@@ -36,7 +36,7 @@ var ServerStatus = React.createClass({displayName: "ServerStatus",
 
 	render: function() {
 		return (
-			React.createElement("span", null, "Server status:", 
+			React.createElement("span", null, 'Server status: ', 
 				React.createElement("span", {style: this.getStatusStyle()}, 
 					this.currentState()
 				)

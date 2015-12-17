@@ -9,6 +9,12 @@ module.exports = function(app, passport) {
 								});
 	});
 	
+	app.get('/login', function(req, res) {
+		res.render('login.ejs', {
+								  message: req.flash(flashConstants.login)
+								});
+	});
+	
 	app.get('/logout', function(req, res) {
 		req.logout();
 		res.redirect('/');
@@ -26,7 +32,7 @@ module.exports = function(app, passport) {
 	
 	app.post('/login', passport.authenticate(passportConstants.local_login, {
 		successRedirect : '/',
-		failureRedirect : '/',
+		failureRedirect : '/login',
 		failureFlash : true
 	}));
 };
