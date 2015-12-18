@@ -1,7 +1,6 @@
-
 // Dependency: serverStateHandlers
 
-var StartServerButton = React.createClass({displayName: "StartServerButton",
+var StartServerButton = React.createClass({
 
 	getInitialState: serverStateHandlers.getInitialState,
 	componentDidMount: serverStateHandlers.makeComponentDidMount(),
@@ -16,18 +15,18 @@ var StartServerButton = React.createClass({displayName: "StartServerButton",
 	
 	render: function() {
 		return (
-			React.createElement("button", {className: "btn btn-success", 
-					onClick: this.startServer, 
-					disabled: this.isDisabled()}, 
+			<button className="btn btn-success"
+					onClick={this.startServer} 
+					disabled={this.isDisabled()} >
 					
-					"Start Server"
+					Start Server
 					
-			)
+			</button>
 		);
 	}
 });
 
-var StopServerButton = React.createClass({displayName: "StopServerButton",
+var StopServerButton = React.createClass({
 	getInitialState: serverStateHandlers.getInitialState,
 	componentDidMount: serverStateHandlers.makeComponentDidMount(),
 		
@@ -41,22 +40,22 @@ var StopServerButton = React.createClass({displayName: "StopServerButton",
 
 	render: function() {
 		return (
-			React.createElement("button", {className: "btn btn-danger", 
-					onClick: this.stopServer, 
-					disabled: this.isDisabled()}, 
+			<button className="btn btn-danger" 
+					onClick={this.stopServer}
+					disabled={this.isDisabled()} >
 				
-					"Stop Server"
+					Stop Server
 					
-			)
+			</button>
 		);
 	}
 });
 
 var adminContainer = document.getElementById('admin-container');
 if (typeof adminContainer !== 'undefined') {
-	ReactDOM.render(React.createElement("div", null, 
-						React.createElement(StartServerButton, null), 
-						React.createElement(StopServerButton, null)
-					), 
+	ReactDOM.render(<div>
+						<StartServerButton />
+						<StopServerButton />
+					</div>, 
 					adminContainer);
 }

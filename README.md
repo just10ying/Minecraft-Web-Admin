@@ -7,7 +7,11 @@ I created this project to familiarize myself with React, Node.js, Mongoose / Mon
 
 Goals:
 - [x] Stop server safely by sending a command to stdin
-- [ ] Share constants between Node and client
+- [x] Share constants between Node and client
+- [x] Fix React structure
 - [ ] Allow client to issue commands
+- [ ] Use RequireJS
+- [ ] Fix: server status duplicate GET requests
 - [ ] Save and visualize metrics using C3
 - [ ] Make client UI prettier
+

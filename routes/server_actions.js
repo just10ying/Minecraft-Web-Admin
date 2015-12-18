@@ -12,7 +12,7 @@ server.listen(appSettings.websocketPort);
 // ----------------------------------- Minecraft Server Singleton ----------------------------------- //
 var minecraftProcess = (function() {
 	var process = null; // Initially no process
-	var server_status = minecraft.server_offline; // Initially offline
+	var server_status = minecraft.state.offline; // Initially offline
 	var setStatus = function(newStatus) {
 		server_status = newStatus;
 		io.sockets.emit(minecraft.state_change, server_status);
@@ -27,10 +27,10 @@ var minecraftProcess = (function() {
 		process.stdout.on('data', function(buf) {
 			// When we find a match that indicates the server is online, broadcast this event.
 			if (buf.toString().match(minecraft.server_online_regex) !== null) {
-				setStatus(minecraft.server_online);
+				setStatus(minecraft.state.online);
 			}
 		});
-		setStatus(minecraft.server_starting);
+		setStatus(minecraft.state.starting);
 	};
 	
 	publicMethods.sendCommand = function(command) {
@@ -44,11 +44,11 @@ var minecraftProcess = (function() {
 	};
 	
 	publicMethods.stop = function(callback) {
-		setStatus(minecraft.server_stopping);
+		setStatus(minecraft.state.stopping);
 		this.sendCommand(minecraft.server_stop_cmd);
 		process.on('exit', function() {
 			process = null;
-			setStatus(minecraft.server_offline);
+			setStatus(minecraft.state.offline);
 			if (typeof callback !== 'undefined') {
 				callback();
 			}
@@ -63,7 +63,7 @@ router.get('/server_status', function(req, res) {
 });
 
 router.post('/start_server', isLoggedIn, function(req, res) {
-	if (minecraftProcess.getStatus() === minecraft.server_offline) {
+	if (minecraftProcess.getStatus() === minecraft.state.offline) {
 		minecraftProcess.create();
 		res.send(msg.success);
 	}
@@ -73,7 +73,7 @@ router.post('/start_server', isLoggedIn, function(req, res) {
 });
 
 router.post('/stop_server', isLoggedIn, function(req, res) {	
-	if (minecraftProcess.getStatus() === minecraft.server_online) {
+	if (minecraftProcess.getStatus() === minecraft.state.online) {
 		minecraftProcess.stop(function() {
 			res.send(msg.success);
 		});
@@ -84,7 +84,7 @@ router.post('/stop_server', isLoggedIn, function(req, res) {
 });
 
 router.post('/exec_command', isLoggedIn, function(req, res) {
-	if (minecraftProcess.getStatus() === minecraft.server_online) {
+	if (minecraftProcess.getStatus() === minecraft.state.online) {
 		minecraftProcess.sendCommand(req.body.command);
 		res.send(msg.success);
 	}

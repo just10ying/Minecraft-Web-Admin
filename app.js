@@ -14,6 +14,7 @@ var express 		= require('express'),
 	
 	msg				= require('./config/messages_constants'),
 	appSettings		= require('./config/app_settings.js'),
+	clientConstants	= require('./config/client_constants'),
 	serverActions	= require('./routes/server_actions');
 
 var app = express();
