@@ -1,6 +1,7 @@
 module.exports = {
 	state_change: 'state_change',
 	server_online_regex: 'For help, type "help"',
+	command_content_regex: '\[.*\] \[.*\]: (.*)',
 	state: {
 		offline: 'offline',
 		starting: 'starting',

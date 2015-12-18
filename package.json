@@ -5,6 +5,7 @@
   "main": "app.js",
   "dependencies": {
     "body-parser": "^1.14.1",
+    "bson": "^0.4.20",
     "express": "^4.13.3",
     "express-jsx": "0.0.4",
     "express-less": "0.0.8",
