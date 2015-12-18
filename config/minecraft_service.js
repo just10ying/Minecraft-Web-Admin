@@ -18,7 +18,7 @@ function setStatus(newStatus) {
 module.exports = {
 	create: function() {
 		return new Promise(function(fulfill, reject) {
-			if (server_status != minecraft.state.offline) {
+			if (server_status !== minecraft.state.offline) {
 				reject();
 			}
 			else {

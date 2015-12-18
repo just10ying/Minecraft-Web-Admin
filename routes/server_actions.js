@@ -9,32 +9,39 @@ router.get('/server_status', function(req, res) {
 });
 
 router.post('/start_server', isLoggedIn, function(req, res) {
-	minecraftService.create().then(function() {
-		res.send(msg.success);
-	}, function() {
-		res.send(msg.failure);
-	});
+	minecraftService.create().then(
+		respondSuccess.bind(res), 
+		respondFailure.bind(res)
+	);
 });
 
 router.post('/stop_server', isLoggedIn, function(req, res) {
-	minecraftService.stop().then(function() {
-		res.send(msg.success);
-	}, function() {
-		res.send(msg.failure);
-	});
+	minecraftService.stop().then(
+		respondSuccess.bind(res), 
+		respondFailure.bind(res)
+	);
 });
 
 router.post('/exec_command', isLoggedIn, function(req, res) {
-	minecraftService.sendCommand(req.body.command).then(function() {
-		res.send(msg.success);
-	}, function() {
-		res.send(msg.failure);
-	});
+	minecraftService.sendCommand(req.body.command).then(
+		respondSuccess.bind(res), 
+		respondFailure.bind(res)
+	);
 });
 
 module.exports = router;
 
 // ----------------------------------- Helper Functions ----------------------------------- //
+
+// Note: to use respondSuccess and respondFailure,
+// you'll have to bind the response object to these functions.
+function respondSuccess() {
+	this.send(msg.success);
+}
+
+function respondFailure() {
+	this.send(msg.failure);
+}
 
 function isLoggedIn(req, res, next) {
 	if (req.isAuthenticated() && req.user.local.admin) return next();
