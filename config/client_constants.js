@@ -1,5 +1,6 @@
 var fs			= require('fs'),
-	minecraft 	= require('./minecraft')
+	minecraft 	= require('./minecraft'),
+	msg			= require('./messages_constants'),
 	constPath	= './public/constants.js';
 	
 var constData = (function(){
@@ -22,5 +23,9 @@ var constData = (function(){
 
 constData.addObject('server_state', minecraft.state);
 constData.addObject('server_state_change', minecraft.state_change);
+constData.addObject('result', {
+	success: msg.success,
+	failure: msg.failure
+});
 
 fs.writeFileSync(constPath, constData.toOutputString(), {flags: 'w+'});

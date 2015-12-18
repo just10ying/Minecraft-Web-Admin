@@ -13,6 +13,7 @@ server.listen(appSettings.websocketPort);
 var minecraftProcess = (function() {
 	var process = null; // Initially no process
 	var server_status = minecraft.state.offline; // Initially offline
+	var shutdownCallback = null;
 	var setStatus = function(newStatus) {
 		server_status = newStatus;
 		io.sockets.emit(minecraft.state_change, server_status);
@@ -28,6 +29,14 @@ var minecraftProcess = (function() {
 			// When we find a match that indicates the server is online, broadcast this event.
 			if (buf.toString().match(minecraft.server_online_regex) !== null) {
 				setStatus(minecraft.state.online);
+			}
+		});
+		process.on('exit', function() {
+			process = null;
+			setStatus(minecraft.state.offline);
+			if (shutdownCallback !== null) {
+				shutdownCallback();
+				shutdownCallback = null;
 			}
 		});
 		setStatus(minecraft.state.starting);
@@ -46,13 +55,7 @@ var minecraftProcess = (function() {
 	publicMethods.stop = function(callback) {
 		setStatus(minecraft.state.stopping);
 		this.sendCommand(minecraft.server_stop_cmd);
-		process.on('exit', function() {
-			process = null;
-			setStatus(minecraft.state.offline);
-			if (typeof callback !== 'undefined') {
-				callback();
-			}
-		});
+		shutdownCallback = callback;
 	};
 	return publicMethods;
 })();
