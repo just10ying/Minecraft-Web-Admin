@@ -4,20 +4,27 @@
 	<% include ./partials/head %>
 	<% include ./partials/sockets %>
 </head>
-<body>		
+<body id="home">		
 
 <% include ./partials/navbar %>
 
-<div class="container">
+<div class="container-fluid">
+	<div class="jumbotron">
+		<h1><span>
+			Emma's Minecraft Server
+		</span></h1>
+	</div>
 	<% if (locals.user && user.local.admin) { %>
+	<div class="container">
 		<div id="admin-container"></div>
 		<script src="admin_modules.js"></script>
+	</div>
 	<% } else  { %>
-		<h1>Welcome to Emma's Minecraft Server!</h1>
-		<div>
-			<p>Login or signup to access server actions.</p>
-			<p>Justin has to make users administrators before they can manage the server.  Ask him to become an admin!</p>
-		</div>
+	<div class="container">
+		<h1>Welcome!</h1>
+		<p>Login or signup to access server actions.</p>
+		<p>You have to be granted admin privileges before you can manage the server.  Ask Justin to become an admin!</p>	
+	</div>
 	<% } %>
 </div>
 	

@@ -13,4 +13,5 @@ Goals:
 - [ ] Use RequireJS
 - [ ] Fix: server status duplicate GET requests
 - [ ] Save and visualize metrics using C3
+- [ ] Better admin request system
 - [ ] Make client UI prettier
