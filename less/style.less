@@ -1,7 +1,6 @@
 @navbar-padding: 20px;
 @container-padding: 15px;
-@jumbotron-height: 500px;
-@title-top-padding: 120px;
+@banner-max-height: 500px;
 
 @navbar-charcoal: #34302D;
 @light-gray: #ACACAC;
@@ -31,27 +30,37 @@
 	}
 }
 
-#home {
-	.jumbotron {
-		background-image: url('../jumbo-bg.jpg');
-		background-repeat: no-repeat;
-		background-attachment: fixed;
-		background-position: center;
-		background-size: 100% auto;
-				
-		margin: -@navbar-padding -@container-padding @navbar-padding -@container-padding;
-		height: @jumbotron-height;
-		
-		border-radius: 0;
-		
-		h1 {
-			text-align: center;
-			padding-top: @title-top-padding;
-			
-			span {
-				background-color: @transparent-gray;
-				color: @lighter-gray;
-			}
-		}
+.banner {
+	margin: -@navbar-padding -@container-padding @navbar-padding -@container-padding;
+	max-height: @banner-max-height;
+	overflow: hidden;
+	position: relative;
+
+	.banner-img {
+		min-width: 100%;
 	}
+	
+	.text-overlay {
+		position: absolute;
+		left: 0;
+		top: 0;
+		right: 0;
+		bottom: 0;
+		
+		display: flex;
+		flex-direction: column;
+		align-items: center;
+		justify-content: center;
+		
+		span {
+			background-color: @transparent-gray;
+			color: @lighter-gray;
+			font-size: 350%;
+			.unselectable();
+		}
+	}		
+}
+
+.footer {
+	height: 50px;
 }
