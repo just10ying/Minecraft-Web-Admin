@@ -1,6 +1,6 @@
 var express 			= require('express'),
 	msg					= require('../config/messages_constants'),
-	minecraftService 	= require('../config/minecraft_service'),
+	minecraftService 	= require('../services/minecraft_service'),
 	router 				= express.Router();
 
 // ----------------------------------- Routing ----------------------------------- //

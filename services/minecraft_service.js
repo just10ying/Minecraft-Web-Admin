@@ -1,6 +1,6 @@
-var minecraft	= require('./minecraft'),
-	appSettings	= require('./app_settings'),
-	msg			= require('./messages_constants'),
+var minecraft	= require('../config/minecraft'),
+	appSettings	= require('../config/app_settings'),
+	msg			= require('../config/messages_constants'),
 	spawn		= require('child_process').spawn,
 	server		= require('http').createServer(),
 	io			= require('socket.io')(server);

@@ -1,9 +1,9 @@
 var LocalStrategy		= require('passport-local').Strategy,
 	User				= require('../models/user'),
-	msg					= require('./messages_constants'),
-	db					= require('./database'),
-	flashConstants		= require('./flash_constants'),
-	passportConstants	= require('./passport_constants');
+	msg					= require('../config/messages_constants'),
+	db					= require('../config/database'),
+	flashConstants		= require('../config/flash_constants'),
+	passportConstants	= require('../config/passport_constants');
 	
 module.exports = function(passport) {
 	passport.serializeUser(function(user, done) {
