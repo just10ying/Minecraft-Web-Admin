@@ -106,6 +106,8 @@ var ServerCommandInput = React.createClass({
 		
 		return (
 			<div>
+				<StartServerButton />
+				<StopServerButton />
 				<form role="form" onSubmit={this.handleSubmit}>
 					<div className="input-group">
 						<span className="input-group-addon" id="command-addon">Command:</span>
@@ -137,14 +139,6 @@ var ServerCommandInput = React.createClass({
 var adminContainer = document.getElementById('admin-container');
 if (typeof adminContainer !== 'undefined') {
 	ReactDOM.render(
-	
-	<div>
-		<div>
-			<StartServerButton />
-			<StopServerButton />
-		</div>
-		<ServerCommandInput />
-	</div>,
-	
-	adminContainer);
+		<ServerCommandInput />	
+	, adminContainer);
 }

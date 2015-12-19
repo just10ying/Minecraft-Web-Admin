@@ -107,6 +107,8 @@ var ServerCommandInput = React.createClass({displayName: "ServerCommandInput",
 		
 		return (
 			React.createElement("div", null, 
+				React.createElement(StartServerButton, null), 
+				React.createElement(StopServerButton, null), 
 				React.createElement("form", {role: "form", onSubmit: this.handleSubmit}, 
 					React.createElement("div", {className: "input-group"}, 
 						React.createElement("span", {className: "input-group-addon", id: "command-addon"}, "Command:"), 
@@ -138,14 +140,6 @@ var ServerCommandInput = React.createClass({displayName: "ServerCommandInput",
 var adminContainer = document.getElementById('admin-container');
 if (typeof adminContainer !== 'undefined') {
 	ReactDOM.render(
-	
-	React.createElement("div", null, 
-		React.createElement("div", null, 
-			React.createElement(StartServerButton, null), 
-			React.createElement(StopServerButton, null)
-		), 
-		React.createElement(ServerCommandInput, null)
-	),
-	
-	adminContainer);
+		React.createElement(ServerCommandInput, null)	
+	, adminContainer);
 }

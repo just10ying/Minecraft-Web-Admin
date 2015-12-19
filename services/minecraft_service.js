@@ -13,7 +13,7 @@ var server_status = minecraft.state.offline; // Initially offline
 
 function setStatus(newStatus) {
 	server_status = newStatus;
-	io.sockets.emit(minecraft.state_change, server_status);
+	io.sockets.emit(minecraft.socket.server_state_change, server_status);
 }
 
 module.exports = {

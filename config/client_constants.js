@@ -22,7 +22,7 @@ var constData = (function(){
 })();
 
 constData.addObject('server_state', minecraft.state);
-constData.addObject('server_state_change', minecraft.state_change);
+constData.addObject('socket', minecraft.socket);
 constData.addObject('result', {
 	success: msg.success,
 	failure: msg.failure

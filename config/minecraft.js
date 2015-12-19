@@ -1,9 +1,12 @@
 module.exports = {
-	state_change: 'state_change',
+	socket: {
+		server_state_change: 'state_change',
+		users_change: 'users_change'
+	},
 	server_online_regex: 'For help, type "help"',
 	command_content_regex: '\[.*\] \[.*\]: (.*)',
 	default_command_delay: 50,
-	commandDelays: {
+	command_delays: {
 		'/example': 150
 	},
 	state: {

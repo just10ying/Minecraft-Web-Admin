@@ -14,7 +14,7 @@ var serverStateHandlers = {
 					server_state: data
 				});
 			}.bind(this));
-			socket.on(constants.server_state_change, function(msg){
+			socket.on(constants.socket.server_state_change, function(msg){
 				this.setState({
 					server_state: msg
 				});

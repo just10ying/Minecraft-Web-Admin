@@ -6,7 +6,7 @@ var process = null;
 var messageBuffer = null;
 
 function getCommandDelay(command) {
-	var delay = minecraftConstants.commandDelays[command];
+	var delay = minecraftConstants.command_delays[command];
 	if (typeof delay === 'undefined') return minecraftConstants.default_command_delay;
 	return delay;
 }
