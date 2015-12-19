@@ -11,11 +11,20 @@ server.listen(appSettings.websocketPort);
 var process = null; // Initially no process
 var server_status = minecraft.state.offline; // Initially offline
 
+// -------------------------------- Private Handler Functions -------------------------------- //
 function setStatus(newStatus) {
 	server_status = newStatus;
 	io.sockets.emit(minecraft.socket.server_state_change, server_status);
 }
 
+// ------------------------------ Register server online handler ----------------------------- //
+
+var stdoutHandlers = require('./minecraft_stdout_handlers')(io);
+stdoutHandlers.add(minecraft.regex.server_online, function() {
+	setStatus(minecraft.state.online);
+});
+
+// -------------------------------- Public Service -------------------------------- //
 module.exports = {
 	create: function() {
 		return new Promise(function(fulfill, reject) {
@@ -28,8 +37,10 @@ module.exports = {
 								{cwd: minecraft.server_directory});
 								process.stdin.setEncoding('utf-8');
 				minecraftIO.registerProcess(process);
-				minecraftIO.onStdout(minecraft.server_online_regex, function() {
-					setStatus(minecraft.state.online);
+				
+				// Register stdout handlers:
+				stdoutHandlers.handlers.forEach(function(handler) {
+					minecraftIO.onStdout(handler.regex, handler.callback);
 				});
 				process.on('exit', function() {
 					process = null;

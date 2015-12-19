@@ -1,10 +1,15 @@
+var regex_base = '\\[.*\\] \\[.*\\]: ';
+
 module.exports = {
 	socket: {
 		server_state_change: 'state_change',
 		users_change: 'users_change'
 	},
-	server_online_regex: 'For help, type "help"',
-	command_content_regex: '\[.*\] \[.*\]: (.*)',
+	regex: {
+		server_online: 'For help, type "help"',
+		player_join: regex_base + '(.*) joined the game',
+		player_leave: regex_base + '(.*) left the game'
+	},
 	default_command_delay: 50,
 	command_delays: {
 		'/example': 150

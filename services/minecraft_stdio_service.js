@@ -1,7 +1,9 @@
+// This is a singleton object (or should be).
+// Any registration of a process overwrites any existing process.
+
 var minecraftConstants = require('../config/minecraft');
 
 var stdoutListeners = [];
-var commandQueue = [];
 var process = null;
 var messageBuffer = null;
 
@@ -14,12 +16,14 @@ function getCommandDelay(command) {
 module.exports = {
 	registerProcess: function(proc) {
 		process = proc;
+		messageBuffer = null;
 		
 		process.stdout.on('data', function(buf) {
 			var outString = buf.toString();
 			stdoutListeners.forEach(function(listener) {
-				if (outString.match(listener.regex)) {
-					listener.callback();
+				var matches = outString.match(listener.regex);
+				if (matches) {
+					listener.callback(matches, outString);
 				}
 			});
 			
@@ -31,6 +35,9 @@ module.exports = {
 	
 	// Register a listener on stdout:
 	// Whenever stdout contains the given regex, the callback will fire.
+	// Callback is passed an array:
+		// The first argument is the entire string that matched the regex
+		// The second argument is just the portion of that expression that was requested.
 	onStdout: function(regex, callback) {
 		stdoutListeners.push({ regex: regex,
 							   callback: callback });
