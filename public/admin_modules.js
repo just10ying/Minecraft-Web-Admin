@@ -63,6 +63,7 @@ var ServerCommandInput = React.createClass({displayName: "ServerCommandInput",
 		var defaultState = serverStateHandlers.getInitialState();
 		defaultState.commandInFlight = false;
 		defaultState.commandValue = '';
+		defaultState.commandOutputs = [];
 		return defaultState;
 	},
 	componentDidMount: serverStateHandlers.makeComponentDidMount(),
@@ -84,32 +85,50 @@ var ServerCommandInput = React.createClass({displayName: "ServerCommandInput",
 					commandValue : '',
 					commandInFlight : false
 				});
-				if (data !== constants.result.success) alert('Error: command failed!');
-				React.findDOMNode(this.refs.commandInput).focus();
+				if (data === constants.result.failure) {
+					alert('Error: command failed!');
+				}
+				else {
+					this.setState({ 
+						commandOutputs: [data].concat(this.state.commandOutputs)
+					});
+				}
+				ReactDOM.findDOMNode(this.refs.commandInput).focus();
 			}.bind(this));
 		}
 	},
 	
 	render: function() {
+		var serverMessages = this.state.commandOutputs.map(function(commandOutput) {
+			return (
+				React.createElement("div", null, commandOutput)
+			);
+		});
+		
 		return (
-			React.createElement("form", {role: "form", onSubmit: this.handleSubmit}, 
-				React.createElement("div", {className: "input-group"}, 
-					React.createElement("span", {className: "input-group-addon", id: "command-addon"}, "Command:"), 
-					React.createElement("input", {type: "text", 
-						ref: "commandInput", 
-						className: "form-control", 
-						placeholder: "Enter a command here", 
-						"aria-describedby": "command-addon", 
-						disabled: this.isDisabled(), 
-						value: this.state.commandValue, 
-						onChange: this.handleCommandChange}), 
-					React.createElement("span", {className: "input-group-btn"}, 
-						React.createElement("button", {type: "submit", 
-							className: "btn btn-default", 
-							disabled: this.isDisabled()}, 
-							"Execute"
+			React.createElement("div", null, 
+				React.createElement("form", {role: "form", onSubmit: this.handleSubmit}, 
+					React.createElement("div", {className: "input-group"}, 
+						React.createElement("span", {className: "input-group-addon", id: "command-addon"}, "Command:"), 
+						React.createElement("input", {type: "text", 
+							ref: "commandInput", 
+							className: "form-control", 
+							placeholder: "Enter a command here", 
+							"aria-describedby": "command-addon", 
+							disabled: this.isDisabled(), 
+							value: this.state.commandValue, 
+							onChange: this.handleCommandChange}), 
+						React.createElement("span", {className: "input-group-btn"}, 
+							React.createElement("button", {type: "submit", 
+								className: "btn btn-default", 
+								disabled: this.isDisabled()}, 
+								"Execute"
+							)
 						)
 					)
+				), 
+				React.createElement("div", {className: "server-output"}, 
+					serverMessages
 				)
 			)
 		);

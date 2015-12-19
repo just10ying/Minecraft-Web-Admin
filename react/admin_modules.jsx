@@ -62,6 +62,7 @@ var ServerCommandInput = React.createClass({
 		var defaultState = serverStateHandlers.getInitialState();
 		defaultState.commandInFlight = false;
 		defaultState.commandValue = '';
+		defaultState.commandOutputs = [];
 		return defaultState;
 	},
 	componentDidMount: serverStateHandlers.makeComponentDidMount(),
@@ -83,34 +84,52 @@ var ServerCommandInput = React.createClass({
 					commandValue : '',
 					commandInFlight : false
 				});
-				if (data !== constants.result.success) alert('Error: command failed!');
-				React.findDOMNode(this.refs.commandInput).focus();
+				if (data === constants.result.failure) {
+					alert('Error: command failed!');
+				}
+				else {
+					this.setState({ 
+						commandOutputs: [data].concat(this.state.commandOutputs)
+					});
+				}
+				ReactDOM.findDOMNode(this.refs.commandInput).focus();
 			}.bind(this));
 		}
 	},
 	
 	render: function() {
+		var serverMessages = this.state.commandOutputs.map(function(commandOutput) {
+			return (
+				<div>{commandOutput}</div>
+			);
+		});
+		
 		return (
-			<form role="form" onSubmit={this.handleSubmit}>
-				<div className="input-group">
-					<span className="input-group-addon" id="command-addon">Command:</span>
-					<input type="text"
-						ref="commandInput"
-						className="form-control"
-						placeholder="Enter a command here"
-						aria-describedby="command-addon"
-						disabled={this.isDisabled()}
-						value={this.state.commandValue}
-						onChange={this.handleCommandChange} />
-					<span className="input-group-btn">
-						<button type="submit"
-							className="btn btn-default"
-							disabled={this.isDisabled()} >
-							Execute
-						</button>
-					</span>
+			<div>
+				<form role="form" onSubmit={this.handleSubmit}>
+					<div className="input-group">
+						<span className="input-group-addon" id="command-addon">Command:</span>
+						<input type="text"
+							ref="commandInput"
+							className="form-control"
+							placeholder="Enter a command here"
+							aria-describedby="command-addon"
+							disabled={this.isDisabled()}
+							value={this.state.commandValue}
+							onChange={this.handleCommandChange} />
+						<span className="input-group-btn">
+							<button type="submit"
+								className="btn btn-default"
+								disabled={this.isDisabled()} >
+								Execute
+							</button>
+						</span>
+					</div>
+				</form>
+				<div className="server-output">
+					{serverMessages}
 				</div>
-			</form>
+			</div>
 		);
 	}
 });

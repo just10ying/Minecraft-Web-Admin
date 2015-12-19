@@ -23,10 +23,9 @@ router.post('/stop_server', isLoggedIn, function(req, res) {
 });
 
 router.post('/exec_command', isLoggedIn, function(req, res) {
-	minecraftService.sendCommand(req.body.command).then(
-		respondSuccess.bind(res), 
-		respondFailure.bind(res)
-	);
+	minecraftService.sendCommand(req.body.command).then(function(output) {
+		res.send(output);
+	},	respondFailure.bind(res));
 });
 
 module.exports = router;

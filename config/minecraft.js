@@ -2,6 +2,10 @@ module.exports = {
 	state_change: 'state_change',
 	server_online_regex: 'For help, type "help"',
 	command_content_regex: '\[.*\] \[.*\]: (.*)',
+	default_command_delay: 50,
+	commandDelays: {
+		'/example': 150
+	},
 	state: {
 		offline: 'offline',
 		starting: 'starting',

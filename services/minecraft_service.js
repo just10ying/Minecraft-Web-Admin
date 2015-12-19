@@ -3,6 +3,7 @@ var minecraft	= require('../config/minecraft'),
 	msg			= require('../config/messages_constants'),
 	spawn		= require('child_process').spawn,
 	server		= require('http').createServer(),
+	minecraftIO	= require('../services/minecraft_stdio_service'),
 	io			= require('socket.io')(server);
 	
 server.listen(appSettings.websocketPort);
@@ -26,11 +27,9 @@ module.exports = {
 								minecraft.server_start_args,
 								{cwd: minecraft.server_directory});
 								process.stdin.setEncoding('utf-8');
-				process.stdout.on('data', function(buf) {
-					// When we find a match that indicates the server is online, broadcast this event.
-					if (buf.toString().match(minecraft.server_online_regex) !== null) {
-						setStatus(minecraft.state.online);
-					}
+				minecraftIO.registerProcess(process);
+				minecraftIO.onStdout(minecraft.server_online_regex, function() {
+					setStatus(minecraft.state.online);
 				});
 				process.on('exit', function() {
 					process = null;
@@ -48,8 +47,9 @@ module.exports = {
 				reject();
 			}
 			else {
-				process.stdin.write(command + '\n');
-				fulfill();
+				minecraftIO.sendStdin(command + '\n').then(function(response) {
+					fulfill(response);
+				}, reject);
 			}
 		});
 	},
