@@ -6,7 +6,7 @@ var ServerStatus = React.createClass({displayName: "ServerStatus",
 	componentDidMount: serverStateHandlers.makeComponentDidMount(),
 	
 	getStatusStyle: function() {
-		switch(this.state.server_state) {
+		switch(this.state.serverState) {
 			case constants.server_state.offline:
 				return { color : 'red' };
 			case constants.server_state.online:
@@ -17,7 +17,7 @@ var ServerStatus = React.createClass({displayName: "ServerStatus",
 	},
 	
 	getServerStateString: function() {
-		return this.state.server_state == null ? '' : this.state.server_state;
+		return this.state.serverState == null ? '' : this.state.serverState;
 	},
 
 	render: function() {

@@ -1,21 +1,18 @@
 
-// Dependency: serverStateHandlers
+// Dependency: serverStateHandlers.
+// USE REQUIRE ASAP
 
 var ServerButtonStyle = {
 	width: '50%'
 };
 
-var StartServerButton = React.createClass({displayName: "StartServerButton",
-
-	getInitialState: serverStateHandlers.getInitialState,
-	componentDidMount: serverStateHandlers.makeComponentDidMount(),
-	
+var StartServerButton = React.createClass({displayName: "StartServerButton",	
 	startServer: function() {
 		$.post('/start_server');
 	},
 	
 	isDisabled: function() {
-		return this.state.server_state !== constants.server_state.offline;
+		return this.props.serverState !== constants.server_state.offline;
 	},
 	
 	render: function() {
@@ -33,15 +30,12 @@ var StartServerButton = React.createClass({displayName: "StartServerButton",
 });
 
 var StopServerButton = React.createClass({displayName: "StopServerButton",
-	getInitialState: serverStateHandlers.getInitialState,
-	componentDidMount: serverStateHandlers.makeComponentDidMount(),
-		
 	stopServer: function() {
 		$.post('/stop_server');
 	},
 	
 	isDisabled: function() {
-		return this.state.server_state !== constants.server_state.online;
+		return this.props.serverState !== constants.server_state.online;
 	},
 
 	render: function() {
@@ -58,18 +52,31 @@ var StopServerButton = React.createClass({displayName: "StopServerButton",
 	}
 });
 
-var ServerCommandInput = React.createClass({displayName: "ServerCommandInput",
+var CommandOutputContainer = React.createClass({displayName: "CommandOutputContainer",
+	render : function() {
+		var serverMessages = this.props.commandOutputs.map(function(commandOutput) {
+			var commands = commandOutput.split('\n').map(function(command) {
+				return (
+					React.createElement("div", null, command)
+				);
+			});
+			return commands;
+		});
+		return (
+			React.createElement("div", {className: "server-output"}, 
+				serverMessages
+			)
+		);
+	}
+});
+
+var CommandServerForm = React.createClass({displayName: "CommandServerForm",
 	getInitialState: function() {
-		var defaultState = serverStateHandlers.getInitialState();
-		defaultState.commandInFlight = false;
-		defaultState.commandValue = '';
-		defaultState.commandOutputs = [];
-		return defaultState;
-	},
-	componentDidMount: serverStateHandlers.makeComponentDidMount(),
-	
-	isDisabled: function() {
-		return this.state.server_state !== constants.server_state.online || this.state.commandInFlight;
+		return {
+			commandInFlight: false,
+			commandValue: '',
+			commandOutputs: []
+		};
 	},
 	
 	handleCommandChange: function(e) {
@@ -86,7 +93,7 @@ var ServerCommandInput = React.createClass({displayName: "ServerCommandInput",
 					commandInFlight : false
 				});
 				if (data === constants.result.failure) {
-					alert('Error: command failed!');
+					alert('Error: command failed!  Please try again.');
 				}
 				else {
 					this.setState({ 
@@ -98,17 +105,13 @@ var ServerCommandInput = React.createClass({displayName: "ServerCommandInput",
 		}
 	},
 	
+	isDisabled: function() {
+		return this.props.serverState !== constants.server_state.online || this.state.commandInFlight;
+	},
+	
 	render: function() {
-		var serverMessages = this.state.commandOutputs.map(function(commandOutput) {
-			return (
-				React.createElement("div", null, commandOutput)
-			);
-		});
-		
 		return (
 			React.createElement("div", null, 
-				React.createElement(StartServerButton, null), 
-				React.createElement(StopServerButton, null), 
 				React.createElement("form", {role: "form", onSubmit: this.handleSubmit}, 
 					React.createElement("div", {className: "input-group"}, 
 						React.createElement("span", {className: "input-group-addon", id: "command-addon"}, "Command:"), 
@@ -129,9 +132,22 @@ var ServerCommandInput = React.createClass({displayName: "ServerCommandInput",
 						)
 					)
 				), 
-				React.createElement("div", {className: "server-output"}, 
-					serverMessages
-				)
+				React.createElement(CommandOutputContainer, {commandOutputs: this.state.commandOutputs})
+			)
+		);
+	}
+});
+
+var ServerAdminModule = React.createClass({displayName: "ServerAdminModule",
+	getInitialState: serverStateHandlers.getInitialState,
+	componentDidMount: serverStateHandlers.makeComponentDidMount(),
+		
+	render: function() {
+		return (
+			React.createElement("div", null, 
+				React.createElement(StartServerButton, {serverState: this.state.serverState}), 
+				React.createElement(StopServerButton, {serverState: this.state.serverState}), 
+				React.createElement(CommandServerForm, {serverState: this.state.serverState})
 			)
 		);
 	}
@@ -140,6 +156,6 @@ var ServerCommandInput = React.createClass({displayName: "ServerCommandInput",
 var adminContainer = document.getElementById('admin-container');
 if (typeof adminContainer !== 'undefined') {
 	ReactDOM.render(
-		React.createElement(ServerCommandInput, null)	
+		React.createElement(ServerAdminModule, null)	
 	, adminContainer);
 }

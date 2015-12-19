@@ -1,20 +1,17 @@
-// Dependency: serverStateHandlers
+// Dependency: serverStateHandlers.
+// USE REQUIRE ASAP
 
 var ServerButtonStyle = {
 	width: '50%'
 };
 
-var StartServerButton = React.createClass({
-
-	getInitialState: serverStateHandlers.getInitialState,
-	componentDidMount: serverStateHandlers.makeComponentDidMount(),
-	
+var StartServerButton = React.createClass({	
 	startServer: function() {
 		$.post('/start_server');
 	},
 	
 	isDisabled: function() {
-		return this.state.server_state !== constants.server_state.offline;
+		return this.props.serverState !== constants.server_state.offline;
 	},
 	
 	render: function() {
@@ -32,15 +29,12 @@ var StartServerButton = React.createClass({
 });
 
 var StopServerButton = React.createClass({
-	getInitialState: serverStateHandlers.getInitialState,
-	componentDidMount: serverStateHandlers.makeComponentDidMount(),
-		
 	stopServer: function() {
 		$.post('/stop_server');
 	},
 	
 	isDisabled: function() {
-		return this.state.server_state !== constants.server_state.online;
+		return this.props.serverState !== constants.server_state.online;
 	},
 
 	render: function() {
@@ -57,18 +51,31 @@ var StopServerButton = React.createClass({
 	}
 });
 
-var ServerCommandInput = React.createClass({
+var CommandOutputContainer = React.createClass({
+	render : function() {
+		var serverMessages = this.props.commandOutputs.map(function(commandOutput) {
+			var commands = commandOutput.split('\n').map(function(command) {
+				return (
+					<div>{command}</div>
+				);
+			});
+			return commands;
+		});
+		return (
+			<div className="server-output">
+				{serverMessages}
+			</div>
+		);
+	}
+});
+
+var CommandServerForm = React.createClass({
 	getInitialState: function() {
-		var defaultState = serverStateHandlers.getInitialState();
-		defaultState.commandInFlight = false;
-		defaultState.commandValue = '';
-		defaultState.commandOutputs = [];
-		return defaultState;
-	},
-	componentDidMount: serverStateHandlers.makeComponentDidMount(),
-	
-	isDisabled: function() {
-		return this.state.server_state !== constants.server_state.online || this.state.commandInFlight;
+		return {
+			commandInFlight: false,
+			commandValue: '',
+			commandOutputs: []
+		};
 	},
 	
 	handleCommandChange: function(e) {
@@ -85,7 +92,7 @@ var ServerCommandInput = React.createClass({
 					commandInFlight : false
 				});
 				if (data === constants.result.failure) {
-					alert('Error: command failed!');
+					alert('Error: command failed!  Please try again.');
 				}
 				else {
 					this.setState({ 
@@ -97,17 +104,13 @@ var ServerCommandInput = React.createClass({
 		}
 	},
 	
+	isDisabled: function() {
+		return this.props.serverState !== constants.server_state.online || this.state.commandInFlight;
+	},
+	
 	render: function() {
-		var serverMessages = this.state.commandOutputs.map(function(commandOutput) {
-			return (
-				<div>{commandOutput}</div>
-			);
-		});
-		
 		return (
 			<div>
-				<StartServerButton />
-				<StopServerButton />
 				<form role="form" onSubmit={this.handleSubmit}>
 					<div className="input-group">
 						<span className="input-group-addon" id="command-addon">Command:</span>
@@ -128,9 +131,22 @@ var ServerCommandInput = React.createClass({
 						</span>
 					</div>
 				</form>
-				<div className="server-output">
-					{serverMessages}
-				</div>
+				<CommandOutputContainer commandOutputs={this.state.commandOutputs} />
+			</div>
+		);
+	}
+});
+
+var ServerAdminModule = React.createClass({
+	getInitialState: serverStateHandlers.getInitialState,
+	componentDidMount: serverStateHandlers.makeComponentDidMount(),
+		
+	render: function() {
+		return (
+			<div>
+				<StartServerButton serverState={this.state.serverState}/>
+				<StopServerButton serverState={this.state.serverState} />
+				<CommandServerForm serverState={this.state.serverState}/>
 			</div>
 		);
 	}
@@ -139,6 +155,6 @@ var ServerCommandInput = React.createClass({
 var adminContainer = document.getElementById('admin-container');
 if (typeof adminContainer !== 'undefined') {
 	ReactDOM.render(
-		<ServerCommandInput />	
+		<ServerAdminModule />	
 	, adminContainer);
 }

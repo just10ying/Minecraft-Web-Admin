@@ -10,8 +10,10 @@ Goals:
 - [x] Share constants between Node and client
 - [x] Fix React structure
 - [x] Allow client to issue commands
-- [ ] Use RequireJS
-- [ ] Fix: server status duplicate GET requests
+- [x] Fixed: server status duplicate GET requests
+- [x] Naming conventions!  Constants with underscores and the rest camel case.
+- [x] Fix React structure more
+- [ ] Use RequireJS (wow I really need this for React)
 - [ ] Save and visualize metrics using C3
 - [ ] Better admin request system
 - [ ] Make client UI prettier
