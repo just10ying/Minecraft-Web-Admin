@@ -9,26 +9,50 @@ var minecraft	= require('../config/minecraft'),
 server.listen(appSettings.websocketPort);
 
 var process = null; // Initially no process
-var server_status = minecraft.state.offline; // Initially offline
+var serverStatus = minecraft.state.offline; // Initially offline
+var onlinePlayers = [];
 
 // -------------------------------- Private Handler Functions -------------------------------- //
 function setStatus(newStatus) {
-	server_status = newStatus;
-	io.sockets.emit(minecraft.socket.server_state_change, server_status);
+	serverStatus = newStatus;
+	io.sockets.emit(minecraft.socket.server_state_change, serverStatus);
 }
 
-// ------------------------------ Register server online handler ----------------------------- //
+// ------------------------------ Register Handlers ----------------------------- //
 
-var stdoutHandlers = require('./minecraft_stdout_handlers')(io);
+var stdoutHandlers = {
+	handlers: [],
+	add: function(regex, callback) {
+		stdoutHandlers.handlers.push({
+			regex: regex,
+			callback: callback
+		});
+	}
+};
+
 stdoutHandlers.add(minecraft.regex.server_online, function() {
 	setStatus(minecraft.state.online);
 });
+
+stdoutHandlers.add(minecraft.regex.player_join, function(match) {
+	var name = match[1];
+	onlinePlayers.push(name);
+	io.sockets.emit(minecraft.socket.users_change, onlinePlayers);
+});
+
+stdoutHandlers.add(minecraft.regex.player_leave, function(match) {
+	var name = match[1];
+	var index = onlinePlayers.indexOf(name);
+	onlinePlayers.splice(index, 1);
+	io.sockets.emit(minecraft.socket.users_change, onlinePlayers);
+});
+
 
 // -------------------------------- Public Service -------------------------------- //
 module.exports = {
 	create: function() {
 		return new Promise(function(fulfill, reject) {
-			if (server_status !== minecraft.state.offline) {
+			if (serverStatus !== minecraft.state.offline) {
 				reject();
 			}
 			else {
@@ -54,7 +78,7 @@ module.exports = {
 	
 	sendCommand: function(command) {
 		return new Promise(function(fulfill, reject) {
-			if (process === null || server_status !== minecraft.state.online) {
+			if (process === null || serverStatus !== minecraft.state.online) {
 				reject();
 			}
 			else {
@@ -66,7 +90,11 @@ module.exports = {
 	},
 	
 	getStatus: function() {
-		return server_status;
+		return serverStatus;
+	},
+	
+	getPlayers: function() {
+		return onlinePlayers;
 	},
 	
 	stop: function() {

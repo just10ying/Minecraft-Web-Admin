@@ -1,4 +1,11 @@
+var fs = require('fs');
 var regex_base = '\\[.*\\] \\[.*\\]: ';
+
+function getMaxPlayers() {
+	var fileContents = fs.readFileSync(module.exports.server_directory + '/' + module.exports.server_properties, 'utf8');
+	var maxPlayersRegex = 'max-players=(.*)';
+	return parseInt(fileContents.match(maxPlayersRegex)[1]);
+}
 
 module.exports = {
 	socket: {
@@ -21,9 +28,13 @@ module.exports = {
 		stopping: 'stopping'
 	},
 	server_directory: '/home/just10ying/minecraft',
+	server_properties: 'server.properties',
 	server_start_cmd: 'java',
 	server_stop_cmd: 'stop',
 	server_start_args: [
 		'-Xmx1024M', '-Xms1024M', '-jar', 'minecraft_server.1.8.9.jar', 'nogui'
 	]
 };
+
+// Retrieve max users information:
+module.exports.maxPlayers = getMaxPlayers();

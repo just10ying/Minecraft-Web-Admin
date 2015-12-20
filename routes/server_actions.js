@@ -8,6 +8,10 @@ router.get('/server_status', function(req, res) {
 	res.send(minecraftService.getStatus());
 });
 
+router.get('/online_players', function(req, res) {
+	res.send(minecraftService.getPlayers());
+});
+
 router.post('/start_server', isLoggedIn, function(req, res) {
 	minecraftService.create().then(
 		respondSuccess.bind(res), 

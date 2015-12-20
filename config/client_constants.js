@@ -27,5 +27,6 @@ constData.addObject('result', {
 	success: msg.success,
 	failure: msg.failure
 });
+constData.addObject('maxPlayers', minecraft.maxPlayers);
 
 fs.writeFileSync(constPath, constData.toOutputString(), {flags: 'w+'});
