@@ -1,6 +1,10 @@
+@md-width: 992px;
+@sm-width: 768px;
+
 @navbar-padding: 20px;
 @container-padding: 15px;
 @banner-max-height: 500px;
+@server-log-height: 200px;
 
 @navbar-charcoal: #34302D;
 @light-gray: #ACACAC;
@@ -61,15 +65,48 @@
 	}
 }
 
-#online-players-container {
-	.col-md-3 {
-		padding: 0;
+#admin-container {
+	.btn {
+		border-radius: 0;
+	}
+	
+	#command-addon {
+		border-radius: 0;
 	}
 
-	.user-list {
+	.status-column {
 		padding: 0;
-		text-align: center;
-		border-right: 1px solid @light-gray;
+		
+		.list {
+			padding: 0;	
+		}
+		
+		.list-group-item.active {
+			border-radius: 0;
+		}
+		
+		.online-players {
+			height: @server-log-height;
+			overflow-y: auto;
+			overflow-x: hidden;
+			border: 1px solid @light-gray;
+			
+			.badge.kick {
+				opacity: .3;
+				&:hover {
+					opacity: 1;
+					cursor: pointer;
+				}
+				transition: .3s;
+			}
+		}
+		
+		.log-output {
+			.online-players();
+			@media (min-width: @sm-width) {
+				border-left: none; // Remove double border on desktop but not on mobile.
+			}
+		}
 	}
 }
 

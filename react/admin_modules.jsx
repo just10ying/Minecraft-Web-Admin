@@ -53,17 +53,24 @@ var StopServerButton = React.createClass({
 
 var CommandOutputContainer = React.createClass({
 	render : function() {
-		var serverMessages = this.props.commandOutputs.map(function(commandOutput) {
-			var commands = commandOutput.split('\n').map(function(command) {
+		var serverMessages = this.props.commandOutputs.map(function(commandOutput, index) {
+			var commands = commandOutput.split('\n').map(function(command, index) {
 				return (
-					<div>{command}</div>
+					<div key={index}>{command}</div>
 				);
 			});
-			return commands;
+			return (
+				<li className="list-group-item" key={index}>{commands}</li>
+			);
 		});
 		return (
-			<div className="server-output">
-				{serverMessages}
+			<div className="col-sm-9 status-column">
+				<ul className="server-output list">
+					<li className="list-group-item active">Command Output</li>
+					<div className="log-output">
+						{serverMessages}
+					</div>
+				</ul>
 			</div>
 		);
 	}
@@ -74,7 +81,6 @@ var CommandServerForm = React.createClass({
 		return {
 			commandInFlight: false,
 			commandValue: '',
-			commandOutputs: []
 		};
 	},
 	
@@ -95,9 +101,7 @@ var CommandServerForm = React.createClass({
 					alert('Error: command failed!  Please try again.');
 				}
 				else {
-					this.setState({ 
-						commandOutputs: [data].concat(this.state.commandOutputs)
-					});
+					this.props.commandDataHandler(data);
 				}
 				ReactDOM.findDOMNode(this.refs.commandInput).focus();
 			}.bind(this));
@@ -131,22 +135,84 @@ var CommandServerForm = React.createClass({
 						</span>
 					</div>
 				</form>
-				<CommandOutputContainer commandOutputs={this.state.commandOutputs} />
+			</div>
+		);
+	}
+});
+
+var OnlinePlayers = React.createClass({
+	getInitialState: function() {
+		return {
+			users: [],
+			maxUsers: null
+		};
+	},
+	componentDidMount: function() {
+		$.get('/online_players', function(data) {
+			this.setState({
+				users: data
+			});
+		}.bind(this));
+		socket.on(constants.socket.users_change, function(data){
+			this.setState({
+				users: data
+			});
+		}.bind(this));
+	},
+	
+	kickPlayer: function(name) {
+		return function() {
+			$.post('/exec_command', {command : 'kick ' + name});
+		};
+	},
+
+	render: function() {
+		var userElements = this.state.users.map(function(user) {
+			return (
+			<li className="list-group-item" key={user}>
+			    <span className="badge kick" onClick={this.kickPlayer(user)}>x</span>
+				{user}
+			</li> );
+		}.bind(this));
+		return (
+			<div className="col-sm-3 status-column">
+				<ul className="list-group user-list">
+					<li className="list-group-item active">Online Players</li>
+					<div className="online-players">
+						{userElements}
+					</div>
+				</ul>
 			</div>
 		);
 	}
 });
 
 var ServerAdminModule = React.createClass({
-	getInitialState: serverStateHandlers.getInitialState,
+	getInitialState: function() {
+		var defaultState = serverStateHandlers.getInitialState();
+		defaultState.commandData = [];
+		return defaultState;
+	},
 	componentDidMount: serverStateHandlers.makeComponentDidMount(),
+	
+	setCommandData: function(data) {
+		this.setState({ 
+			commandData: [data].concat(this.state.commandData)
+		});
+	},
 		
 	render: function() {
 		return (
 			<div>
-				<StartServerButton serverState={this.state.serverState}/>
-				<StopServerButton serverState={this.state.serverState} />
-				<CommandServerForm serverState={this.state.serverState}/>
+				<div>
+					<StartServerButton serverState={this.state.serverState}/>
+					<StopServerButton serverState={this.state.serverState} />
+					<CommandServerForm serverState={this.state.serverState} commandDataHandler={this.setCommandData}/>
+				</div>
+				<div>
+					<OnlinePlayers />
+					<CommandOutputContainer commandOutputs={this.state.commandData} />
+				</div>
 			</div>
 		);
 	}

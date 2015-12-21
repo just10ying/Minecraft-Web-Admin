@@ -54,17 +54,24 @@ var StopServerButton = React.createClass({displayName: "StopServerButton",
 
 var CommandOutputContainer = React.createClass({displayName: "CommandOutputContainer",
 	render : function() {
-		var serverMessages = this.props.commandOutputs.map(function(commandOutput) {
-			var commands = commandOutput.split('\n').map(function(command) {
+		var serverMessages = this.props.commandOutputs.map(function(commandOutput, index) {
+			var commands = commandOutput.split('\n').map(function(command, index) {
 				return (
-					React.createElement("div", null, command)
+					React.createElement("div", {key: index}, command)
 				);
 			});
-			return commands;
+			return (
+				React.createElement("li", {className: "list-group-item", key: index}, commands)
+			);
 		});
 		return (
-			React.createElement("div", {className: "server-output"}, 
-				serverMessages
+			React.createElement("div", {className: "col-sm-9 status-column"}, 
+				React.createElement("ul", {className: "server-output list"}, 
+					React.createElement("li", {className: "list-group-item active"}, "Command Output"), 
+					React.createElement("div", {className: "log-output"}, 
+						serverMessages
+					)
+				)
 			)
 		);
 	}
@@ -75,7 +82,6 @@ var CommandServerForm = React.createClass({displayName: "CommandServerForm",
 		return {
 			commandInFlight: false,
 			commandValue: '',
-			commandOutputs: []
 		};
 	},
 	
@@ -96,9 +102,7 @@ var CommandServerForm = React.createClass({displayName: "CommandServerForm",
 					alert('Error: command failed!  Please try again.');
 				}
 				else {
-					this.setState({ 
-						commandOutputs: [data].concat(this.state.commandOutputs)
-					});
+					this.props.commandDataHandler(data);
 				}
 				ReactDOM.findDOMNode(this.refs.commandInput).focus();
 			}.bind(this));
@@ -131,23 +135,85 @@ var CommandServerForm = React.createClass({displayName: "CommandServerForm",
 							)
 						)
 					)
-				), 
-				React.createElement(CommandOutputContainer, {commandOutputs: this.state.commandOutputs})
+				)
+			)
+		);
+	}
+});
+
+var OnlinePlayers = React.createClass({displayName: "OnlinePlayers",
+	getInitialState: function() {
+		return {
+			users: [],
+			maxUsers: null
+		};
+	},
+	componentDidMount: function() {
+		$.get('/online_players', function(data) {
+			this.setState({
+				users: data
+			});
+		}.bind(this));
+		socket.on(constants.socket.users_change, function(data){
+			this.setState({
+				users: data
+			});
+		}.bind(this));
+	},
+	
+	kickPlayer: function(name) {
+		return function() {
+			$.post('/exec_command', {command : 'kick ' + name});
+		};
+	},
+
+	render: function() {
+		var userElements = this.state.users.map(function(user) {
+			return (
+			React.createElement("li", {className: "list-group-item", key: user}, 
+			    React.createElement("span", {className: "badge kick", onClick: this.kickPlayer(user)}, "x"), 
+				user
+			) );
+		}.bind(this));
+		return (
+			React.createElement("div", {className: "col-sm-3 status-column"}, 
+				React.createElement("ul", {className: "list-group user-list"}, 
+					React.createElement("li", {className: "list-group-item active"}, "Online Players"), 
+					React.createElement("div", {className: "online-players"}, 
+						userElements
+					)
+				)
 			)
 		);
 	}
 });
 
 var ServerAdminModule = React.createClass({displayName: "ServerAdminModule",
-	getInitialState: serverStateHandlers.getInitialState,
+	getInitialState: function() {
+		var defaultState = serverStateHandlers.getInitialState();
+		defaultState.commandData = [];
+		return defaultState;
+	},
 	componentDidMount: serverStateHandlers.makeComponentDidMount(),
+	
+	setCommandData: function(data) {
+		this.setState({ 
+			commandData: [data].concat(this.state.commandData)
+		});
+	},
 		
 	render: function() {
 		return (
 			React.createElement("div", null, 
-				React.createElement(StartServerButton, {serverState: this.state.serverState}), 
-				React.createElement(StopServerButton, {serverState: this.state.serverState}), 
-				React.createElement(CommandServerForm, {serverState: this.state.serverState})
+				React.createElement("div", null, 
+					React.createElement(StartServerButton, {serverState: this.state.serverState}), 
+					React.createElement(StopServerButton, {serverState: this.state.serverState}), 
+					React.createElement(CommandServerForm, {serverState: this.state.serverState, commandDataHandler: this.setCommandData})
+				), 
+				React.createElement("div", null, 
+					React.createElement(OnlinePlayers, null), 
+					React.createElement(CommandOutputContainer, {commandOutputs: this.state.commandData})
+				)
 			)
 		);
 	}

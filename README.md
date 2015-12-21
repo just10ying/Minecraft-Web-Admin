@@ -13,8 +13,9 @@ Goals:
 - [x] Fixed: server status duplicate GET requests
 - [x] Naming conventions!  Constants with underscores and the rest camel case.
 - [x] Fix React structure more
-- [ ] Save and visualize metrics using C3
+- [x] Make client UI prettier
+- [ ] Server status on client should reflect if server is killed
+- [ ] Split up less file / use includes
 - [ ] Abstract minecraft server process spawning from socket IO
 - [ ] Use RequireJS (wow I really need this for React)
 - [ ] Better admin request system
-- [ ] Make client UI prettier
