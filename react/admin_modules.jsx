@@ -167,9 +167,9 @@ var OnlinePlayers = React.createClass({
 	},
 
 	render: function() {
-		var userElements = this.state.users.map(function(user) {
+		var userElements = this.state.users.map(function(user, index) {
 			return (
-			<li className="list-group-item" key={user}>
+			<li className="list-group-item" key={index}>
 			    <span className="badge kick" onClick={this.kickPlayer(user)}>x</span>
 				{user}
 			</li> );

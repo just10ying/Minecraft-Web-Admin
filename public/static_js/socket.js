@@ -1,1 +1,1 @@
-var socket = io.connect(':3001');
+var socket = io.connect(':3001', { 'connect_timeout': 5000});

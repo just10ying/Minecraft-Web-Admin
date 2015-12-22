@@ -16,7 +16,7 @@ var ServerStatus = React.createClass({
 	},
 	
 	getServerStateString: function() {
-		return this.state.serverState == null ? '' : this.state.serverState;
+		return this.state.serverState == null ? 'Attempting to reach server...' : this.state.serverState;
 	},
 
 	render: function() {
