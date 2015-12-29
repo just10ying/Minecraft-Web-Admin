@@ -11,10 +11,10 @@
 <div class="container-fluid">
 	<% include ./partials/banner %>
 	<% if (locals.user && user.local.admin) { %>
-	<div class="container">
-		<div id="admin-container"></div>
-		<script src="admin_modules.js"></script>
-	</div>
+		<div class="container">
+			<div id="admin-container"></div>
+			<script src="admin_modules.js"></script>
+		</div>
 	<% } else  { %>
 	<div class="container">
 		<h1>Welcome!</h1>

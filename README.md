@@ -15,6 +15,7 @@ Goals:
 - [x] Fix React structure more
 - [x] Make client UI prettier
 - [x] Server status on client should reflect if server is killed
+- [ ] Bugfix: sometimes users will be listed as online twice.
 - [ ] Split up less file / use includes
 - [ ] Abstract minecraft server process spawning from socket IO
 - [ ] Use RequireJS (wow I really need this for React)
